@@ -73,6 +73,7 @@ class GRUGNNCell(nn.Module):
                                         layers=n_layers,
                                         activation='elu',
                                         gnn_layer=gnn_layer,
+                                        edge_dim=edge_dim
                                         )
 
 
@@ -92,12 +93,7 @@ class GRUGNNCell(nn.Module):
                                   )
 
 
-        self.lin2= nn.Sequential(nn.Linear(2*hidden_size,hidden_size),
-                                  nn.Tanh(),
-                                  nn.Linear(hidden_size,hidden_size),
-                                  nn.Tanh(),
-                                  nn.Linear(hidden_size,hidden_size),
-                                  )
+        self.lin2= nn.Linear(2*hidden_size,hidden_size)
         self.lin1= nn.Linear(hidden_size,hidden_size)
         self.tan = nn.Sequential(  nn.LayerNorm(hidden_size),
            nn.Tanh(),)
@@ -120,7 +116,7 @@ class GRUGNNCell(nn.Module):
 
 
         haha= self.hi(h)
-        wrh = torch.tanh(self.bias+ self.Wh(x, edge_index,edge_attr=None))
+        wrh = torch.tanh(self.bias+ self.Wh(x, edge_index,edge_attr))
         wrr =  self.hi2(x)
         hidden = h+ self.lin2(torch.cat((h,self.lin1(self.dropout(self.tan((wrr+wrh)*haha)))),-1))
  
